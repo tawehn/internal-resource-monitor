@@ -7,23 +7,27 @@ provider:
   runtime: nodejs4.3
   environment:
     DYNAMODB_TABLE: "${self:service}-${self:provider.stage}-resourcesTable"
+  iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+          - dynamodb:Scan
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+        Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
 
 
 functions:
-  hello:
-    handler: handler.hello
+  updateTimestamp:
+    handler: functions/updateTimestamp.handler
+    events:
+      - http:
+          path: update/{name}
+          method: get
 
-iamRoleStatements:
-  - Effect: Allow
-    Action:
-      - dynamodb:Query
-      - dynamodb:Scan
-      - dynamodb:GetItem
-      - dynamodb:PutItem
-      - dynamodb:UpdateItem
-      - dynamodb:DeleteItem
-    Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
-
+  
 resources:
   Resources:
     ResourcesDynamoDbTable:
