@@ -11,12 +11,14 @@ module.exports = {
 }
 
 function createResource(name) {
-    const now = new Date().getTime();
+    const now = new Date().toUTCString();
     const params = {
         TableName: process.env.DYNAMODB_TABLE,
         Item: {
             name: name,
             available: true,
+            notified: false,
+            lastNotified: null,
             lastSeen: now,
             created: now,
         },
@@ -27,8 +29,23 @@ function createResource(name) {
         });
 }
 
-function updateResource(name) {
-    return "RESOURCE UPDATED";
+function updateResource(name, available, notified, lastSeen, lastNotified) {
+    const params = {
+        TableName: process.env.DYNAMODB_TABLE,
+        Key: {
+            name: name,
+        },
+
+        ExpressionAttributeValues: {
+            ':available': available,
+            ':notified': notified,
+            ':lastSeen': lastSeen,
+            ':lastNotified': lastNotified
+        },
+        UpdateExpression: 'SET available = :available, notified = :notified,lastSeen= :lastSeen,lastNotified = :lastNotified',
+        ReturnValues: 'ALL_NEW',
+    };
+    return dynamoDb.updateAsync(params);
 }
 
 function listResources() {
@@ -48,9 +65,9 @@ function getResourceByName(name) {
 
 function updateTimeStamp(resourceName) {
     return getResourceByName(resourceName)
-        .then((res) => {
-            if (!res) return createResource(resourceName);
-            else return updateResource(resourceName);
+        .then((resource) => {
+            if (!resource) return createResource(resourceName);
+            return updateResource(resourceName,true,false,new Date().toUTCString(),null).then((res) => console.log(res));
         });
 }
 
