@@ -67,7 +67,7 @@ function updateTimeStamp(resourceName) {
     return getResourceByName(resourceName)
         .then((resource) => {
             if (!resource) return createResource(resourceName);
-            return updateResource(resourceName,true,false,new Date().toUTCString(),null).then((res) => console.log(res));
+            return updateResource(resourceName,true,false,new Date().toUTCString(),null);
         });
 }
 
