@@ -1,9 +1,8 @@
 'use strict';
-var dataContext = require('../dataContext')
+const resourceLogic = require('../resource/resource.logic')
 
 module.exports.handler = (event, context, callback) => {
-  dataContext.updateTimeStamp(event.pathParameters.name).then((res) => {
-    console.log(res);
+  resourceLogic.updateTimeStamp(event.pathParameters.name).then((res) => {
     const response = {
       statusCode: 200,
       body: JSON.stringify({

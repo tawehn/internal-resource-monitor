@@ -12,6 +12,9 @@
     "aws-sdk": "^2.28.0"
   },
   "dependencies": {
-    "bluebird": "^3.5.0"
+    "bluebird": "^3.5.0",
+    "moment": "^2.17.1",
+    "pushover-notifications": "^0.2.4",
+    "serverless-secrets-plugin": "0.0.1"
   }
 }

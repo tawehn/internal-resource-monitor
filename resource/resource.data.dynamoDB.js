@@ -1,3 +1,5 @@
+'use strict';
+
 const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-dependencies
 const Promise = require('bluebird');
 const dynamoDb = Promise.promisifyAll(new AWS.DynamoDB.DocumentClient());
@@ -5,7 +7,6 @@ const dynamoDb = Promise.promisifyAll(new AWS.DynamoDB.DocumentClient());
 module.exports = {
     createResource: createResource,
     getResourceByName: getResourceByName,
-    updateTimeStamp: updateTimeStamp,
     updateResource: updateResource,
     listResources: listResources
 }
@@ -49,7 +50,10 @@ function updateResource(name, available, notified, lastSeen, lastNotified) {
 }
 
 function listResources() {
-
+    const params = {
+        TableName: process.env.DYNAMODB_TABLE,
+    };
+    return dynamoDb.scanAsync(params).then((res) => {return res.Items;});
 }
 
 function getResourceByName(name) {
@@ -62,15 +66,3 @@ function getResourceByName(name) {
             return res.Item;
         });
 }
-
-function updateTimeStamp(resourceName) {
-    return getResourceByName(resourceName)
-        .then((resource) => {
-            if (!resource) return createResource(resourceName);
-            return updateResource(resourceName,true,false,new Date().toUTCString(),null);
-        });
-}
-
-
-
-

@@ -2,11 +2,21 @@ service: internal-resource-monitor
 
 frameworkVersion: ">=1.1.0 <2.0.0"
 
+custom:
+  secrets: ${file(secrets.yml)}
+
 provider:
   name: aws
   runtime: nodejs4.3
   environment:
-    DYNAMODB_TABLE: "${self:service}-${self:provider.stage}-resourcesTable"
+    DYNAMODB_TABLE: "${self:service}-${opt:stage}-resourcesTable"
+    TIMEOUT: 15
+    # These should eventually be loaded from a file, but it seems like there are some issues
+    # preventing loading variables from files and I just gave up.
+    # Will probably fix eventually.
+    # https://github.com/serverless/serverless/issues/3369
+    PUSHOVER_APP_KEY: ${env:PUSHOVER_IRM_APP_KEY}
+    PUSHOVER_USER_KEY: ${env:PUSHOVER_USER_KEY}
   iamRoleStatements:
       - Effect: Allow
         Action:
@@ -20,6 +30,11 @@ provider:
 
 
 functions:
+  checkAvailability:
+    handler: functions/checkAvailability.handler
+    events:
+      - schedule: rate(15 minutes)
+
   updateTimestamp:
     handler: functions/updateTimestamp.handler
     events:
