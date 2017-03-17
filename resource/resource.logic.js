@@ -30,7 +30,7 @@ function checkResourceRequiresAttention(resource) {
 
 function processAvailableResource(resourceName, resource) {
     if (!resource) return dataContext.createResource(resourceName);
-    if (!resource.available) notificationLogic.sendAvailableMessage(resource.name, new Date().toUTCString());
+    if (!resource.available) notificationLogic.sendAvailableMessage(resource.name, resource.lastSeen.toUTCString());
     return dataContext.updateResource(resourceName, true, false, new Date().toUTCString(), null);
 }
 
